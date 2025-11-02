@@ -2,9 +2,10 @@ import Config
 
 # Configure your database
 config :real_deal_api, RealDealApi.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "backend_stuff",
+  password: "testpass123",
   hostname: "localhost",
+  port: 5433,
   database: "real_deal_api_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

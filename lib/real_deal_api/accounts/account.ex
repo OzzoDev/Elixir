@@ -7,6 +7,7 @@ defmodule RealDealApi.Accounts.Account do
   schema "accounts" do
     field :email, :string
     field :hashed_password_string, :string
+    has_one :user, RealDealApi.Users.User
 
     timestamps(type: :utc_datetime)
   end
@@ -16,5 +17,8 @@ defmodule RealDealApi.Accounts.Account do
     account
     |> cast(attrs, [:email, :hashed_password_string])
     |> validate_required([:email, :hashed_password_string])
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_length(:email, max: 160)
+    |> unique_constraint(:email)
   end
 end

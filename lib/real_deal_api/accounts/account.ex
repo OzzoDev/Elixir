@@ -6,7 +6,7 @@ defmodule RealDealApi.Accounts.Account do
   @foreign_key_type :binary_id
   schema "accounts" do
     field :email, :string
-    field :hashed_password_string, :string
+    field :hashed_password, :string
     has_one :user, RealDealApi.Users.User
 
     timestamps(type: :utc_datetime)
@@ -15,8 +15,8 @@ defmodule RealDealApi.Accounts.Account do
   @doc false
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:email, :hashed_password_string])
-    |> validate_required([:email, :hashed_password_string])
+    |> cast(attrs, [:email, :hashed_password])
+    |> validate_required([:email, :hashed_password])
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
     |> unique_constraint(:email)

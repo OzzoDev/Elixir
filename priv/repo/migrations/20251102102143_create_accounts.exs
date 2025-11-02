@@ -5,7 +5,7 @@ defmodule RealDealApi.Repo.Migrations.CreateAccounts do
     create table(:accounts, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :email, :string
-      add :hashed_password_string, :string
+      add :hashed_password, :string
 
       timestamps(type: :utc_datetime)
     end

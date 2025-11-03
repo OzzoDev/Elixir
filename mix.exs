@@ -50,6 +50,7 @@ defmodule RealDealApi.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:guardian, "~> 2.3"},
+      {:guardian_db, "~> 2.0"},
       {:pbkdf2_elixir, "~> 2.0"}
     ]
   end

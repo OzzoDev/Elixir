@@ -19,7 +19,7 @@ defmodule RealDealApiWeb.AccountJSON do
     %{
       id: account.id,
       email: account.email,
-      hashed_password_string: account.hashed_password
+      hashed_password: account.hashed_password
     }
   end
 

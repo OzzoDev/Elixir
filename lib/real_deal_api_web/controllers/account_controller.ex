@@ -26,15 +26,16 @@ defmodule RealDealApiWeb.AccountController do
 
   def create(conn, %{"account" => account_params}) do
     with {:ok, %Account{} = account} <- Accounts.create_account(account_params),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(account),
          {:ok, %User{} = _user} <- Users.create_user(account, account_params) do
-      conn
-      |> put_status(:created)
-      |> json(RealDealApiWeb.AccountJSON.account_token(%{account: account, token: token}))
+      authorize_account(conn, account.email, account_params["hashed_password"])
     end
   end
 
   def sign_in(conn, %{"email" => email, "hashed_password" => hashed_password}) do
+    authorize_account(conn, email, hashed_password)
+  end
+
+  defp authorize_account(conn, email, hashed_password) do
     case Guardian.authenticate(email, hashed_password) do
       {:ok, account, token} ->
         conn
@@ -48,28 +49,13 @@ defmodule RealDealApiWeb.AccountController do
   end
 
   def refresh_session(conn, %{}) do
-    old_token = Guardian.Plug.current_token(conn)
+    token = Guardian.Plug.current_token(conn)
+    {:ok, account, new_token} = Guardian.authenticate(token)
 
-    case Guardian.decode_and_verify(old_token) do
-      {:ok, claims} ->
-        case Guardian.resource_from_claims(claims) do
-          {:ok, account} ->
-            {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
-
-            conn
-            |> Plug.Conn.put_session(:account_id, account.id)
-            |> put_status(:ok)
-            |> json(
-              RealDealApiWeb.AccountJSON.account_token(%{account: account, token: new_token})
-            )
-
-          {:error, _reason} ->
-            raise ErrorResponse.NotFound
-        end
-
-      {:error, _reason} ->
-        raise ErrorResponse.NotFound
-    end
+    conn
+    |> Plug.Conn.put_session(:account_id, account.id)
+    |> put_status(:ok)
+    |> json(RealDealApiWeb.AccountJSON.account_token(%{account: account, token: new_token}))
   end
 
   def sign_out(conn, %{}) do
